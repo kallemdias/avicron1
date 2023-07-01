@@ -1,0 +1,88 @@
+entity Fancier {
+	firstName String required
+    lastName String required
+    loftName String required
+	email String required pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)
+	phone String required
+	addressLine1 String 
+	addressLine2 String
+	city String 
+	country String
+    fancierImage ImageBlob
+}
+
+enum Gender {
+	MALE, FEMALE, UNKNOWN
+}
+
+entity Pigeon {
+	country String minlength(2) maxlength(3)
+    year Integer min(1970) max(2050)
+    ringNrOne String
+    ringNrTwo String
+    ringNrThree String
+    ringDisplayedVal String
+    name String
+    gendre Gender    
+    bredBy String
+    color String
+    strain String
+    bodyImage ImageBlob
+    eyeImage ImageBlob    
+}
+
+entity Pedigree {
+	name String minlength(5)
+    version String
+    generated Instant
+    modified Instant
+    published Instant
+}
+
+entity Document {
+	title String 
+  	docSize Long 
+  	mimeType String
+	extension String 
+	uploadDate Instant 
+}
+
+entity Content {
+  data AnyBlob required
+}
+
+entity Award {
+	order Integer min(0)
+    description String maxlength(100)
+    visible Boolean
+}
+
+relationship OneToOne {
+	Fancier{user(login)} to User
+}
+
+relationship OneToMany {
+	Pigeon{fatherOf} to Pigeon{father(ringDisplayedVal)},
+    Pigeon{motherOf} to Pigeon{mother(ringDisplayedVal)},
+    Fancier{pigeon} to Pigeon{owner(loftName)},
+    Pigeon{award} to Award{pigeon(ringDisplayedVal)},
+    Pigeon{pedigree} to Pedigree{pigeon(ringDisplayedVal)},
+    Pigeon{document} to Document{pigeon(id) required},
+    Fancier{document} to Document{fancier(id) required}    
+}
+
+relationship OneToOne {
+   Document{content} to Content{document(id) required}
+}
+
+// Set pagination options
+paginate * with infinite-scroll
+// Use Data Transfert Objects (DTO)
+// dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl 
+// Set an angular suffix
+// angularSuffix * with mySuffix
+
+
